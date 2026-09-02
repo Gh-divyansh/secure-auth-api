@@ -1,0 +1,64 @@
+// use prisma-next
+model User {
+  id               Int                        @id @default(autoincrement())
+  email            String                     @unique
+  passwordHash     String?
+  emailVerifiedAt  TimestamptzString?
+  createdAt        TimestamptzString          @default(now())
+  updatedAt        temporal.updatedAtString()
+
+  otpVerifications OtpVerification[]
+  sessions         Session[]
+}
+
+model PendingSignup {
+  id           Int                @id @default(autoincrement())
+  email        String             @unique
+  passwordHash String
+  otpHash      String?
+  otpExpiresAt TimestamptzString?
+  otpAttempts  Int                @default(0)
+  createdAt    TimestamptzString  @default(now())
+  updatedAt    temporal.updatedAtString()
+}
+
+model OtpVerification {
+  id         Int                @id @default(autoincrement())
+  userId     Int
+  otpHash    String
+  expiresAt  TimestamptzString
+  attempts   Int                @default(0)
+  consumedAt TimestamptzString?
+  createdAt  TimestamptzString  @default(now())
+
+  user       User               @relation(fields:[userId], references:[id])
+
+  @@index([userId, consumedAt, createdAt])
+}
+
+model Session {
+  id            Int                @id @default(autoincrement())
+  userId        Int
+  expiresAt     TimestamptzString
+  revokedAt     TimestamptzString?
+  createdAt     TimestamptzString  @default(now())
+
+  user          User               @relation(fields:[userId], references:[id])
+  refreshTokens RefreshToken[]
+
+  @@index([userId])
+}
+
+model RefreshToken {
+  id        Int                @id @default(autoincrement())
+  sessionId Int
+  tokenHash String             @unique
+  expiresAt TimestamptzString
+  createdAt TimestamptzString  @default(now())
+  rotatedAt TimestamptzString?
+  revokedAt TimestamptzString?
+
+  session   Session            @relation(fields:[sessionId], references:[id])
+
+  @@index([sessionId])
+}

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "table.pendingSignup",
+    "label": "Create table \"pendingSignup\"",
+    "summary": "Creates table \"pendingSignup\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "pendingSignup"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"pendingSignup\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"pendingSignup\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"pendingSignup\"",
+        "sql": "CREATE TABLE \"public\".\"pendingSignup\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"otpAttempts\" int4 DEFAULT 0 NOT NULL,\n  \"otpExpiresAt\" timestamptz,\n  \"otpHash\" text,\n  \"passwordHash\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"pendingSignup\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"pendingSignup\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.pendingSignup.pendingSignup_email_key",
+    "label": "Add unique constraint on \"pendingSignup\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "pendingSignup_email_key",
+        "table": "pendingSignup"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"pendingSignup_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "pendingSignup_email_key",
+          "public",
+          "\"public\".\"pendingSignup\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"pendingSignup_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"pendingSignup\" ADD CONSTRAINT \"pendingSignup_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"pendingSignup_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "pendingSignup_email_key",
+          "public",
+          "\"public\".\"pendingSignup\""
+        ]
+      }
+    ]
+  }
+]

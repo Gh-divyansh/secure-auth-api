@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { @apply box-border; }
+  body { @apply min-h-screen bg-slate-950 text-slate-100 antialiased; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+  button, input { font: inherit; }
+  :focus-visible { outline: 2px solid #67e8f9; outline-offset: 2px; }
+}
+@layer components {
+  .field { margin-top:.5rem; width:100%; border-radius:.75rem; border:1px solid #334155; background:rgba(15,23,42,.7); padding:.75rem 1rem; color:#f1f5f9; transition:border-color .15s; }
+  .field::placeholder { color:#64748b; } .field:focus { border-color:#22d3ee; }
+  .label { font-size:.875rem; font-weight:500; color:#cbd5e1; }
+  .primary { display:inline-flex; width:100%; align-items:center; justify-content:center; border-radius:.75rem; background:#22d3ee; padding:.75rem 1rem; font-weight:600; color:#071425; transition:background .15s; }
+  .primary:hover { background:#67e8f9; } .primary:disabled { cursor:not-allowed; opacity:.5; }
+  .card { border-radius:1.5rem; border:1px solid rgba(255,255,255,.1); background:rgba(15,23,42,.8); box-shadow:0 25px 50px -12px rgba(0,0,0,.25); backdrop-filter:blur(12px); }
+}
